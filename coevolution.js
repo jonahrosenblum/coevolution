@@ -520,13 +520,6 @@ function runSimulation(numAppendages, popSize, brainMutationRate, bodyMutationRa
     }
 
     generatePop() {
-      let firstGen = false;
-      let newPop = undefined;
-      if (this.pop === {}) 
-        firstGen = true;
-      if (!firstGen) {
-        newPop = this.getNewPop();
-      }
       this.pop = {}
       let coords = this.getCoordinates();
       const order = [brain, eye, mouth, eye];
@@ -683,7 +676,7 @@ button.addEventListener('click', function(){
   state.reset = true;
   setTimeout(function(){ 
     state.reset = false;
-    runSimulation(state.numAppendages, state.popSize); 
+    runSimulation(state.numAppendages, state.popSize, state.brainMutationRate, state.bodyMutationRate); 
   }, 100);
 });
 
