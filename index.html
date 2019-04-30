@@ -16,8 +16,8 @@
         <div class="col">
           Population Size
           </br>
-          2 <input type="range" step="1" min="2" max="30" id="popSizeSlider" value="10"> 30<br>
-          <div id="popSize">Current value: 10</div>
+          2 <input type="range" step="1" min="2" max="30" id="popSizeSlider" value="12"> 30<br>
+          <div id="popSize">Current value: 12</div>
         </div>
         <div class="col">
           Brain Mutation Rate
@@ -31,6 +31,13 @@
             <input type="text" id="bodyMutationRate" value=".05"><br>
             Must be between [0-1]
           </div>
+        <div class="col">
+          Mutation Rate Heriditary
+          <label class="switch">
+            <input type="checkbox" id="heritageToggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
     </div>
     <br><br>
     <div id="gen">Generation 0</div>
