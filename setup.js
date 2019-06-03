@@ -14,7 +14,6 @@ const world = engine.world;
 engine.world.gravity.y = 0;
 setInterval(function() { Engine.update(engine, 1000 / 60); }, 1000 / 60);
 
-
 // some constants for the organism's bodies
 // const eaten = 0;
 const brain = 0;

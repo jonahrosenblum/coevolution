@@ -138,7 +138,7 @@ class Population {
     const newBody = this.getNBody(this.numAppendages, replacement.bodyGenerator, 
                                   replacement.order, bodyCoords.x, bodyCoords.y);
     
-    const newBrain = neataptic.Network.fromJSON(replacement.brain.toJSON());
+    const newBrain = neataptic.Network.fromJSON(replacement.organismBrain.toJSON());
     const newBodyGenerator = neataptic.Network.fromJSON(replacement.bodyGenerator.toJSON());
     const newOrder = JSON.parse(JSON.stringify(replacement.order));
 
@@ -153,23 +153,23 @@ class Population {
     
     newBody.brainMutationRate = currentBrainMutationRate
     newBody.bodyMutationRate = currentBodyMutationRate;
-    for (let weight = 0; weight < newBrain.connections.length; ++weight) {
-      if (getRandom(0,1) > 1 - currentBrainMutationRate) {
-        newBrain.connections[weight].weight += getRandom(neataptic.methods.mutation.MOD_WEIGHT.min, 
+    for (let connection = 0; connection < newBrain.connections.length; ++connection) {
+      if (getRandom(0, 1) > 1 - currentBrainMutationRate) {
+        newBrain.connections[connection].weight += getRandom(neataptic.methods.mutation.MOD_WEIGHT.min, 
                                                                   neataptic.methods.mutation.MOD_WEIGHT.max);
       }
     }
 
     for (let node = 0; node < newBrain.nodes.length; ++node) {
-      if (getRandom(0,1) > 1 - currentBrainMutationRate) {
+      if (getRandom(0, 1) > 1 - currentBrainMutationRate) {
         newBrain.nodes[node].bias += getRandom(neataptic.methods.mutation.MOD_BIAS.min, 
                                                         neataptic.methods.mutation.MOD_BIAS.max);
       }
     }
 
-    for (let weight = 0; weight < newBodyGenerator.connections.length; ++weight) {
-      if (getRandom(0,1) > 1 - currentBodyMutationRate) {
-        newBodyGenerator.connections[weight].weight += getRandom(neataptic.methods.mutation.MOD_WEIGHT.min, 
+    for (let connection = 0; connection < newBodyGenerator.connections.length; ++connection) {
+      if (getRandom(0, 1) > 1 - currentBodyMutationRate) {
+        newBodyGenerator.connections[connection].weight += getRandom(neataptic.methods.mutation.MOD_WEIGHT.min, 
                                                                       neataptic.methods.mutation.MOD_WEIGHT.max);
       }
     }
@@ -184,9 +184,9 @@ class Population {
     if (getRandom(0,1) > 1 - currentBrainMutationRate) {
       newOrder.randomSwap(newOrder.length);
     }
-    let organism = new Organism(newBody, newOrder, newBodyGenerator, false);
+
+    let organism = new Organism(newBody, newOrder, newBrain, newBodyGenerator);
     this.pop[newBody.id] = organism;
-    this.pop[newBody.id].setBrainAndBody(newBrain, newBodyGenerator);
     this.pop[newBody.id].setMutationRates(currentBrainMutationRate, currentBodyMutationRate);
     World.add(world, newBody);
   }
@@ -197,31 +197,49 @@ class Population {
     let order = [brain, eye, mouth, eye];
     const length = order.length;
     for (let i = 0; i < this.numAppendages - length; ++i) {
-      if (i % 3 == 0) {
+      if (i % 3 === 0) {
         order.push(brain);
+      } else if (i % 3 === 1) {
+        order.push(mouth);
       } else {
         order.push(regular);
       }
     }
 
-    //console.log(this.numAppendages - order.length, order);
+    // for the first generation we want the brains and bodies to be somewhat random, 
+    // so we scramble them here.
+    let organismBrain = neataptic.architect.Perceptron(24, 30, 20, 10, 3);
     
-    const bodyGenerator = neataptic.architect.Perceptron(4*this.numAppendages, 4*(this.numAppendages+3), 
-                                                         4*(this.numAppendages+1), this.numAppendages);
-    for (let j = 0; j < bodyGenerator.nodes.length; ++j) {
-      bodyGenerator.nodes[j].squash = neataptic.methods.activation.TANH;
+    let bodyGenerator = neataptic.architect.Perceptron(4 * this.numAppendages, 4 * (this.numAppendages + 3), 
+                                                         4 * (this.numAppendages+1), this.numAppendages);
+    for (let i = 0; i < organismBrain.nodes.length; ++i) {
+      // using TANH for the squash so we can get negative values as output
+      organismBrain.nodes[i].squash = neataptic.methods.activation.TANH;
+    }
+    for (let i = 0; i < bodyGenerator.nodes.length; ++i) {
+      bodyGenerator.nodes[i].squash = neataptic.methods.activation.TANH;
     }
 
-    for (let j = 0; j < this.popSize; ++j) {
-      for (let k = 0; k < 500; ++k) {
+    for (let i = 0; i < this.popSize; ++i) {
+      // do a deep copy each time - otherwise each organism has the same brain/body generator
+      organismBrain = neataptic.Network.fromJSON(organismBrain.toJSON());
+      bodyGenerator = neataptic.Network.fromJSON(bodyGenerator.toJSON());
+
+      // here's where we scramble the brains and body generators, 500 is totally arbitrary
+      for (let j = 0; j < 500; ++j) {
+        organismBrain.mutate(neataptic.methods.mutation.MOD_WEIGHT);
+        organismBrain.mutate(neataptic.methods.mutation.MOD_BIAS);
+      }
+      for (let j = 0; j < 500; ++j) {
         bodyGenerator.mutate(neataptic.methods.mutation.MOD_WEIGHT);
         bodyGenerator.mutate(neataptic.methods.mutation.MOD_BIAS);
       }
+
       order = shuffle(order);
       coords = shuffle(coords);
       const bodyCoords = coords.pop();
       const body = this.getNBody(this.numAppendages, bodyGenerator, order, bodyCoords.x, bodyCoords.y);
-      let organism = new Organism(body, order, bodyGenerator, true);
+      let organism = new Organism(body, order, organismBrain, bodyGenerator);
       organism.setMutationRates(this.brainMutationRate, this.bodyMutationRate);
       this.pop[body.id] = organism;
     }

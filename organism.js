@@ -2,37 +2,26 @@
 // fitness, and movements.
 class Organism {
 
-  constructor(body, order, bodyGenerator, firstGen) {
+  constructor(body, order, organismBrain, bodyGenerator) {
     this.body = body;
     this.fitness = 0;
-    this.eyeIndex1 = -1;
-    this.eyeIndex2 = -1;
-    this.mouthIndex = 0;
-    this.brain = undefined;
+    this.eyeIndex1 = undefined;
+    this.eyeIndex2 = undefined;
+    this.mouthIndex = undefined;
+    this.organismBrain = organismBrain;
     this.bodyGenerator = bodyGenerator;
     this.order = order;
     this.brainMutationRate = .05;
     this.bodyMutationRate = .05;
 
+    // these are values that will be given to the brain so it can understand its body
     for (let i = 0; i < this.body.parts.length; ++i) {
-      if (body.parts[i].label === eye && this.eyeIndex1 === -1) {
+      if (body.parts[i].label === eye && !this.eyeIndex1) {
         this.eyeIndex1 = i;
       } else if (body.parts[i].label === eye){
         this.eyeIndex2 = i;
       } else if (body.parts[i].label === mouth) {
         this.mouthIndex = i;
-      }
-    }
-    // for the first generation we want the brains to be somewhat random, so we scramble them here
-    if (firstGen) {
-      this.brain = neataptic.architect.Perceptron(24,30,20,10,3);
-      for (let j = 0; j < this.brain.nodes.length; ++j) {
-        // using TANH for the squash so we can get negative values as output
-        this.brain.nodes[j].squash = neataptic.methods.activation.TANH;
-      }
-      for (let k = 0; k < 500; ++k) {
-        this.brain.mutate(neataptic.methods.mutation.MOD_WEIGHT);
-        this.brain.mutate(neataptic.methods.mutation.MOD_BIAS);
       }
     }
   }
@@ -50,7 +39,7 @@ class Organism {
   }
 
   eatBrain() {
-    this.fitness += 80;
+    this.fitness += 20;
   }
 
 
@@ -66,7 +55,7 @@ class Organism {
           y: yMultiplier * 1E5
         });
     // remove all raycast collisions with the organisms own body
-    while(array.last() !== undefined && array.last().body.parent.id === this.body.id) {
+    while(array.last() && array.last().body.parent.id === this.body.id) {
       array.pop();
     }
     return array;       
@@ -164,7 +153,7 @@ class Organism {
   }
 
   getEaten() {
-  this.fitness -= 30;
+    this.fitness -= 30;
   }
 
   nextMovement() {
@@ -178,7 +167,7 @@ class Organism {
 
     if (brainInputs === undefined || brainInputs.length !== 22) return;
     
-    const brainOutputs = this.brain.activate(brainInputs);
+    const brainOutputs = this.organismBrain.activate(brainInputs);
     
     const forceX = brainOutputs[0] / 200;
     const forceY = brainOutputs[1] / 200
@@ -203,11 +192,6 @@ class Organism {
     }
 
     this.body.torque += torque;
-  }
-
-  setBrainAndBody(brain, bodyGenerator) {
-    this.brain = brain;
-    this.bodyGenerator = bodyGenerator;
   }
 
   setMutationRates(brainMutationRate, bodyMutationRate) {
