@@ -206,24 +206,21 @@ class Population {
       }
     }
 
-    // for the first generation we want the brains and bodies to be somewhat random, 
-    // so we scramble them here.
-    let organismBrain = neataptic.architect.Perceptron(24, 30, 20, 10, 3);
     
-    let bodyGenerator = neataptic.architect.Perceptron(4 * this.numAppendages, 4 * (this.numAppendages + 3), 
-                                                         4 * (this.numAppendages+1), this.numAppendages);
-    for (let i = 0; i < organismBrain.nodes.length; ++i) {
-      // using TANH for the squash so we can get negative values as output
-      organismBrain.nodes[i].squash = neataptic.methods.activation.TANH;
-    }
-    for (let i = 0; i < bodyGenerator.nodes.length; ++i) {
-      bodyGenerator.nodes[i].squash = neataptic.methods.activation.TANH;
-    }
 
     for (let i = 0; i < this.popSize; ++i) {
-      // do a deep copy each time - otherwise each organism has the same brain/body generator
-      organismBrain = neataptic.Network.fromJSON(organismBrain.toJSON());
-      bodyGenerator = neataptic.Network.fromJSON(bodyGenerator.toJSON());
+      // for some reason the deep copy doesn't work very well... need to recreate
+      // the brain and generator each time :(
+      const organismBrain = neataptic.architect.Perceptron(24, 30, 20, 10, 3);
+      const bodyGenerator = neataptic.architect.Perceptron(4 * this.numAppendages, 4 * (this.numAppendages + 3), 
+                                                          4 * (this.numAppendages+1), this.numAppendages);
+      for (let j = 0; j < organismBrain.nodes.length; ++j) {
+        // using TANH for the squash so we can get negative values as output
+        organismBrain.nodes[j].squash = neataptic.methods.activation.TANH;
+      }
+      for (let j = 0; j < bodyGenerator.nodes.length; ++j) {
+        bodyGenerator.nodes[j].squash = neataptic.methods.activation.TANH;
+      }
 
       // here's where we scramble the brains and body generators, 500 is totally arbitrary
       for (let j = 0; j < 500; ++j) {

@@ -39,7 +39,7 @@ class Organism {
   }
 
   eatBrain() {
-    this.fitness += 20;
+    this.fitness += 5;
   }
 
 
@@ -88,6 +88,7 @@ class Organism {
     brainInputs.push(Math.sin(eyeAngle2));
     brainInputs.push(Math.cos(eyeToMouthAngle2));
     brainInputs.push(Math.sin(eyeToMouthAngle2));
+    // 600 is totally arbitrary, seems to work well based on my limited testing
     brainInputs.push(Math.sqrt(
         Math.pow(bodies1.last().point.x - this.body.position.x, 2) +
         Math.pow(bodies1.last().point.y - this.body.position.y, 2) 
@@ -96,8 +97,9 @@ class Organism {
         Math.pow(bodies2.last().point.x - this.body.position.x, 2) +
         Math.pow(bodies2.last().point.y - this.body.position.y, 2) 
         ) / 600);
-
-    for (let input = 0; input < numTypes; ++input) {
+    
+    // add numTypes 0s to the end of the array
+    for (let i = 0; i < numTypes; ++i) {
       brainInputs.push(0);
     }
     let numInputs = 17;
@@ -123,9 +125,10 @@ class Organism {
         break;
     }
 
-    for (let input = 0; input < numTypes; ++input) {
+    for (let i = 0; i < numTypes; ++i) {
       brainInputs.push(0);
     }
+    // after we add more zeros the size of our inputs changes
     numInputs = 22;
 
     switch(bodies2.last().body.label) {

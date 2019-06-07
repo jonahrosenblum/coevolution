@@ -1,23 +1,4 @@
-function runSimulation(numAppendages, popSize, brainMutationRate, bodyMutationRate, mutationRateHeritage) {
-  
-  const render = Render.create({
-    element: document.body,
-    engine: engine,
-    options: {
-      width: Math.min(document.documentElement.clientWidth, 1000),
-      height: Math.min(document.documentElement.clientHeight, 700),
-      wireframes: false,
-      showCollisions: false,
-    }
-  });
-  Matter.Render.run(render);
-  const runner = Runner.create();
-  Runner.run(runner, engine);
-
-  let myPop = new Population(popSize, numAppendages, brainMutationRate, bodyMutationRate, mutationRateHeritage);
-  myPop.generatePop();
-  myPop.addGenerationToWorld();
-
+function addEvents(engine, myPop) {
   Events.on(engine, 'collisionStart', function(event) {
     var pairs = event.pairs;
     for (var i = 0, j = pairs.length; i != j; ++i) {
@@ -44,7 +25,6 @@ function runSimulation(numAppendages, popSize, brainMutationRate, bodyMutationRa
         }
     }
   });
-
 
   let counter = 0;
 
@@ -78,21 +58,47 @@ function runSimulation(numAppendages, popSize, brainMutationRate, bodyMutationRa
       runner.events = {}
       World.clear(engine.world);
       Engine.clear(engine);
+      Runner.stop(runner);
+      Render.stop(render);
       return;
     }
   });
+}
 
+function runSimulation(numAppendages, popSize, brainMutationRate, bodyMutationRate, mutationRateHeritage) {
+
+  engine = Engine.create();
+  world = engine.world;
+
+  engine.world.gravity.y = 0;
+  render = Render.create({
+    element: document.body,
+    engine: engine,
+    options: {
+      width: Math.min(document.documentElement.clientWidth, 1000),
+      height: Math.min(document.documentElement.clientHeight, 700),
+      wireframes: false,
+      showCollisions: false,
+    }
+  });
+  
+
+  Matter.Render.run(render);
+  runner = Runner.create();
+  Runner.run(runner, engine);
+
+  myPop = new Population(popSize, numAppendages, brainMutationRate, bodyMutationRate, mutationRateHeritage);
+  myPop.generatePop();
+  myPop.addGenerationToWorld();
+  
+  addEvents(engine, myPop);
+
+  engineBackUp = Matter.Common.clone(engine);
 }
 
 // run the simulation with the default values
 runSimulation(8, 12, .05, .05, false);
 
-const state = {'numAppendages': 6,
-               'popSize': 12,
-               'brainMutationRate': .05,
-               'bodyMutationRate': .05,
-               'reset': false,
-               'passOnMutation' : false};
 
 const button = document.getElementById("simulationRunner");
 
@@ -139,4 +145,12 @@ bodyMutationInput.addEventListener('input', function(){
 const heritageToggle = document.getElementById("heritageToggle");
 heritageToggle.addEventListener('click', function(){
   state.passOnMutation = !state.passOnMutation;
+});
+
+const speedUpButton = document.getElementById("speedUpButton");
+speedUpButton.addEventListener('click', function() {
+  (function run() {
+    window.requestAnimationFrame(run);
+    Engine.update(engine, 1000 / 60);
+  })();
 });

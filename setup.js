@@ -7,15 +7,16 @@ const Composite = Matter.Composite;
 const Body = Matter.Body;
 const Bodies = Matter.Bodies;
 const Vertices = Matter.Vertices;
-const engine = Engine.create();
-const world = engine.world;
+const Pairs = Matter.Pairs;
+let engine = undefined;
+let world = undefined;
+let runner = undefined;
+let render = undefined;
+let myPop = undefined;
 
-// screw you Netwon!
-engine.world.gravity.y = 0;
 setInterval(function() { Engine.update(engine, 1000 / 60); }, 1000 / 60);
 
 // some constants for the organism's bodies
-// const eaten = 0;
 const brain = 0;
 const regular = 1;
 const eye = 2;
@@ -89,3 +90,12 @@ function shuffle(array) {
 function has(object, key) {
   return object ? hasOwnProperty.call(object, key) : false;
 }
+
+const state = {
+  'numAppendages': 8,
+  'popSize': 12,
+  'brainMutationRate': .05,
+  'bodyMutationRate': .05,
+  'reset': false,
+  'passOnMutation' : false
+};
