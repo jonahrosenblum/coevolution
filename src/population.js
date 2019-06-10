@@ -188,7 +188,7 @@ class Population {
     let organism = new Organism(newBody, newOrder, newBrain, newBodyGenerator);
     this.pop[newBody.id] = organism;
     this.pop[newBody.id].setMutationRates(currentBrainMutationRate, currentBodyMutationRate);
-    World.add(world, newBody);
+    World.add(engine.world, newBody);
   }
 
   generatePop() {
@@ -211,7 +211,7 @@ class Population {
       // the brain and generator each time :(
       const organismBrain = neataptic.architect.Perceptron(24, 30, 20, 10, 3);
       const bodyGenerator = neataptic.architect.Perceptron(4 * this.numAppendages, 4 * (this.numAppendages + 3), 
-                                                          4 * (this.numAppendages+1), this.numAppendages);
+                                                          4 * (this.numAppendages + 1), this.numAppendages);
       for (let j = 0; j < organismBrain.nodes.length; ++j) {
         // using TANH for the squash so we can get negative values as output
         organismBrain.nodes[j].squash = neataptic.methods.activation.TANH;
@@ -244,7 +244,7 @@ class Population {
     const bodiesInWorld = Composite.allBodies(engine.world);
     // need to remove all bodies before adding more
     for (let i = 0; i < bodiesInWorld.length; ++i) {
-      World.remove(world, bodiesInWorld[i]);
+      World.remove(engine.world, bodiesInWorld[i]);
     }
     
     let newBodies = [];
@@ -262,7 +262,7 @@ class Population {
     const rightWall = Bodies.rectangle(1000, 200, 20, 1000, { isStatic: true });
     rightWall.label = WALL;
 
-    World.add(world, newBodies.concat([ground, ceiling, leftWall, rightWall]));
+    World.add(engine.world, newBodies.concat([ground, ceiling, leftWall, rightWall]));
   }
 
 }
