@@ -3,16 +3,16 @@
 class Organism {
 
   constructor(body, order, organismBrain, bodyGenerator) {
-    this.body = body;
+    this.eyeIndex1;
+    this.eyeIndex2;
+    this.mouthIndex;
+    this.brainMutationRate = .05;
+    this.bodyMutationRate = .05;
     this.fitness = 0;
-    this.eyeIndex1 = undefined;
-    this.eyeIndex2 = undefined;
-    this.mouthIndex = undefined;
     this.organismBrain = organismBrain;
     this.bodyGenerator = bodyGenerator;
     this.order = order;
-    this.brainMutationRate = .05;
-    this.bodyMutationRate = .05;
+    this.body = body;
 
     // these are values that will be given to the brain so it can understand its body
     for (let i = 0; i < this.body.parts.length; ++i) {
