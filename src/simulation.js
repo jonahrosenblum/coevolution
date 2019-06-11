@@ -58,13 +58,12 @@ class Simulation {
       if (!this.coevolutionPop || !this.coevolutionPop.pop) return;
       // if we do a raycast before every update this simulation lags, this helps space it out
       if (this.counter % 5 === 0) {
-        for (let key in this.coevolutionPop.pop){
-          if (this.coevolutionPop !== undefined) {
-            let organism = this.coevolutionPop.pop[key];
+        Object.values(this.coevolutionPop.pop).forEach((organism) => {
+          if (this.coevolutionPop) {
             organism.nextMovement();
-            this.coevolutionPop.pop[key].survivalBonus();
+            organism.survivalBonus();
           }
-        }
+        });
       }
       
       // 1000 updates per generation is very arbitrary, it's just a way to measure time passing
@@ -82,7 +81,6 @@ class Simulation {
   
     Events.on(this.runner, "afterTick", () => {
       if (this.reset) {
-        this.render.canvas.remove();
         engine.events = {}
         this.runner.events = {}
         World.clear(engine.world);
@@ -153,6 +151,7 @@ class Simulation {
     this.render = Render.create({
       element: document.body,
       engine: engine,
+      canvas: document.getElementById('.simulation'),
       options: {
         width: Math.min(document.documentElement.clientWidth, 1000),
         height: Math.min(document.documentElement.clientHeight, 700),

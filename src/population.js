@@ -8,17 +8,17 @@ class Population {
     this.mutationRateHeritage = mutationRateHeritage;
   }
 
-  tournamentSelection(myPopList) {
+  tournamentSelection(popList) {
     const tournamentSize = 3;
     let bestOrganism = undefined;
 
     for (let i = 0; i < tournamentSize; ++i) {
-      let index = myPopList.length;
+      let index = popList.length;
       // get a random integer that isn't out of the list range
-      while (index === myPopList.length) {
-        index = Math.floor(getRandom(0, myPopList.length));
+      while (index === popList.length) {
+        index = Math.floor(getRandom(0, popList.length));
       }
-      const randomOrganism = myPopList[index];
+      const randomOrganism = popList[index];
       if (bestOrganism === undefined || (randomOrganism.getFitness() > bestOrganism.getFitness())) {
         bestOrganism = randomOrganism;
       }
@@ -28,8 +28,8 @@ class Population {
 
   getCoordinates() {
     let coords = []
-    for (let x = 150; x < 950; x+= 100) {
-      for (let y = 150; y < 650; y += 100) {
+    for (let x = 150; x < 900; x += 100) {
+      for (let y = 150; y < Math.min(document.documentElement.clientHeight, 700) - 100; y += 100) {
         coords.push({'x': x, 'y': y});
       }
     }
@@ -75,6 +75,7 @@ class Population {
     
     for (let i = 0; i < numAppendages; ++i) {
       const len1 = 30 + lengthsOfParts[i];
+      // if we are at the last element in the array, wrap back around to the start
       const len2 = 30 + ((i === numAppendages - 1) ? lengthsOfParts[0] : lengthsOfParts[i + 1]);
       const xCoord1 = len1 * Math.cos(angle / 2 + (2 * i * Math.PI / numAppendages));
       const xCoord2 = len2 * Math.cos(angle / 2 + (2 * (i + 1) * Math.PI / numAppendages));
@@ -124,16 +125,14 @@ class Population {
     
     return body;
   }
-
+  
   replaceOrganism(idOfReplaced) {
     delete this.pop[idOfReplaced];
-    let myPopList = [];
-    for (var key in this.pop) {
-      myPopList.push(this.pop[key]);
-    }
-    const replacement = this.tournamentSelection(myPopList);
-    let coords = this.getCoordinates();
-    coords = shuffle(coords);
+    const popList = [];
+    Object.values(this.pop).forEach((org) => popList.push(org));
+  
+    const replacement = this.tournamentSelection(popList);
+    const coords = shuffle(this.getCoordinates());
     const bodyCoords = coords.pop();
     const newBody = this.getNBody(this.numAppendages, replacement.bodyGenerator, 
                                   replacement.order, bodyCoords.x, bodyCoords.y);
@@ -185,7 +184,7 @@ class Population {
       newOrder.randomSwap(newOrder.length);
     }
 
-    let organism = new Organism(newBody, newOrder, newBrain, newBodyGenerator);
+    const organism = new Organism(newBody, newOrder, newBrain, newBodyGenerator);
     this.pop[newBody.id] = organism;
     this.pop[newBody.id].setMutationRates(currentBrainMutationRate, currentBodyMutationRate);
     World.add(engine.world, newBody);
@@ -198,11 +197,11 @@ class Population {
     const length = order.length;
     for (let i = 0; i < this.numAppendages - length; ++i) {
       if (i % 3 === 0) {
-        order.push(BRAIN);
+        order.push(REGULAR);
       } else if (i % 3 === 1) {
         order.push(MOUTH);
       } else {
-        order.push(REGULAR);
+        order.push(BRAIN);
       }
     }
 
@@ -248,12 +247,10 @@ class Population {
     }
     
     let newBodies = [];
-    
-    for (var key in this.pop){
-      newBodies.push(this.pop[key].body);
-    }
+    Object.values(this.pop).forEach((organism) => newBodies.push(organism.body));
 
-    const ground = Bodies.rectangle(400, 700, 1200, 20, { isStatic: true });
+    // sometimes the window is too small, so we adjust the ground to match
+    const ground = Bodies.rectangle(400, Math.min(document.documentElement.clientHeight, 700), 1200, 20, { isStatic: true, label: WALL });
     ground.label = WALL;
     const ceiling = Bodies.rectangle(400, 0, 1200, 20, { isStatic: true });
     ceiling.label = WALL;
@@ -261,7 +258,7 @@ class Population {
     leftWall.label = WALL;
     const rightWall = Bodies.rectangle(1000, 200, 20, 1000, { isStatic: true });
     rightWall.label = WALL;
-
+  
     World.add(engine.world, newBodies.concat([ground, ceiling, leftWall, rightWall]));
   }
 
