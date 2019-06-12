@@ -21,6 +21,7 @@ class Simulation {
     this.heritageToggle = document.getElementById("heritageToggle");
     this.speedUpButton = document.getElementById("speedUpButton");
     this.runButton = document.getElementById("simulationRunner");
+    this.currentSpeed = 0;
     this.intervals = [];
   }
 
@@ -135,10 +136,14 @@ class Simulation {
     
     this.speedUpButton.addEventListener('click', () => {
       this.intervals.push(setInterval(() => Matter.Engine.update(engine, 1000 / 60), 1000 / 60));
+      this.currentSpeed += (this.currentSpeed > 29) ? 0 : 1;
+      document.getElementById("currentSpeed").innerHTML = "Current speed: {0}".format(this.currentSpeed);
     });
 
     this.slowDownButton.addEventListener('click', () => {
       this.intervals.forEach((interval) => clearInterval(interval));
+      this.currentSpeed = 0;
+      document.getElementById("currentSpeed").innerHTML = "Current speed: {0}".format(this.currentSpeed);
     });
   }
 
@@ -153,7 +158,7 @@ class Simulation {
       engine: engine,
       canvas: document.getElementById('.simulation'),
       options: {
-        width: Math.min(document.documentElement.clientWidth, 1000),
+        width: Math.min(document.documentElement.clientWidth, 1200),
         height: Math.min(document.documentElement.clientHeight, 700),
         wireframes: false,
         showCollisions: false,
