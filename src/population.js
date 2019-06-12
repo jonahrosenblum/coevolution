@@ -28,7 +28,7 @@ class Population {
 
   getCoordinates() {
     let coords = []
-    for (let x = 150; x < 900; x += 100) {
+    for (let x = 150; x < 1100; x += 100) {
       for (let y = 150; y < Math.min(document.documentElement.clientHeight, 700) - 100; y += 100) {
         coords.push({'x': x, 'y': y});
       }
@@ -250,13 +250,13 @@ class Population {
     Object.values(this.pop).forEach((organism) => newBodies.push(organism.body));
 
     // sometimes the window is too small, so we adjust the ground to match
-    const ground = Bodies.rectangle(400, Math.min(document.documentElement.clientHeight, 700), 1200, 20, { isStatic: true, label: WALL });
+    const ground = Bodies.rectangle(400, Math.min(document.documentElement.clientHeight, 700), 1600, 20, { isStatic: true });
     ground.label = WALL;
-    const ceiling = Bodies.rectangle(400, 0, 1200, 20, { isStatic: true });
+    const ceiling = Bodies.rectangle(400, 0, 1600, 20, { isStatic: true });
     ceiling.label = WALL;
     const leftWall = Bodies.rectangle(0, 200, 20, 1000, { isStatic: true });
     leftWall.label = WALL;
-    const rightWall = Bodies.rectangle(1000, 200, 20, 1000, { isStatic: true });
+    const rightWall = Bodies.rectangle(1200, 200, 20, 1000, { isStatic: true });
     rightWall.label = WALL;
   
     World.add(engine.world, newBodies.concat([ground, ceiling, leftWall, rightWall]));
