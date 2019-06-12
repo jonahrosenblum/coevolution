@@ -46,19 +46,9 @@ class Organism {
   getRaycast(eyeIndex) {
     // this list of bodies is useful for raycasting
     const bodies = Composite.allBodies(engine.world);
-    //console.log(this.body);
-    const xMultiplier = this.body.parts[eyeIndex].vertices[1].x;
-    const yMultiplier = this.body.parts[eyeIndex].vertices[1].y;
-    // const Multiplierx = Math.pow(this.body.position.x - this.body.parts[eyeIndex].vertices[0].x, 2);
-    // const Multipliery = Math.pow(this.body.position.y - this.body.parts[eyeIndex].vertices[0].y, 2);
-    // console.log(Math.sqrt(Multiplierx + Multipliery));
-    const context = simulation.render.context;
-    context.beginPath();
-    context.moveTo(this.body.parts[eyeIndex].position.x, this.body.parts[eyeIndex].position.y);
-    context.lineTo(xMultiplier + 10, yMultiplier + 10);
-    context.lineWidth = 0.5;
-    context.strokeStyle = '#fff';
-    context.stroke();
+    const angle = (Math.PI * 2 / (this.body.parts.length - 1));
+    const xMultiplier = Math.cos(angle * eyeIndex + this.body.angle);
+    const yMultiplier = Math.sin(angle * eyeIndex + this.body.angle);
 
     // why such a large number? smaller numbers don't work for some reason.
     const array = raycast(bodies, this.body.parts[eyeIndex].position, 
@@ -99,17 +89,15 @@ class Organism {
     brainInputs.push(Math.sin(eyeAngle2));
     brainInputs.push(Math.cos(eyeToMouthAngle2));
     brainInputs.push(Math.sin(eyeToMouthAngle2));
-    // 600 is totally arbitrary, seems to work well based on my limited testing
-    brainInputs.push(Math.sqrt(
+    // 950 is totally arbitrary, seems to work well based on my limited testing
+    brainInputs.push(1 - Math.sqrt(
         Math.pow(bodies1.last().point.x - this.body.position.x, 2) +
         Math.pow(bodies1.last().point.y - this.body.position.y, 2) 
-        ) / 600);
-    //console.log(brainInputs.last());
-    brainInputs.push(Math.sqrt(
+        ) / 950);
+    brainInputs.push(1 - Math.sqrt(
         Math.pow(bodies2.last().point.x - this.body.position.x, 2) +
         Math.pow(bodies2.last().point.y - this.body.position.y, 2) 
-        ) / 600);
-    //console.log(brainInputs.last());
+        ) / 950);
     // add numTypes 0s to the end of the array
     for (let i = 0; i < numTypes; ++i) {
       brainInputs.push(0);
@@ -187,7 +175,7 @@ class Organism {
     const forceX = brainOutputs[0] / 200;
     const forceY = brainOutputs[1] / 200
     const torque = brainOutputs[2] / 400;
-    return;
+
     Body.applyForce(this.body, this.body.position, {
       x: forceX, 
       y: forceY
