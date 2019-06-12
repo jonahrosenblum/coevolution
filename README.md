@@ -11,7 +11,7 @@
 - Originally a final project for a class at University of Michigan (CMPLXSYS 425: Evolution in Silico), this retuned and vastly improved simulation shows how mind and body can evolve in conjunction with one another. 
 - In this simulation each organism has one [artificial neural network](https://en.wikipedia.org/wiki/Artificial_neural_network) (ANN) which controls its movement (like a brain) and another ANN which decides the shape of its body.
 ## Organisms and the Environment
-- Each organism is made up of a certain number of 'appendages' which is how many section it is broken up into. These sections can be long or short, and all serve different purposes. Here is an image for reference  
+- Each organism is made up of a certain number of 'appendages' which is how many section it is broken up into. These sections can be different lengths, and all serve unique purposes. Here is an image for reference  
 ![Reference Photo](https://github.com/jonahrosenblum/coevolution/blob/master/photos/explanation.png)  
 - Each yellow section is an 'eye.' This is the main source of information input to the organism's brain, and informs the organism on how it should move. Before it decides where to move, the organism will look out of its eye to see what is the closest organism/wall to it, and some other factors like current speed and angle. 
 - Of course the organism needs a way to eat, which is why it can have one or many 'mouths' - the blue sections on the organism. If an organism touches its mouth to another organism's red section (the brain), then the eater will consume the other organism - increasing the fitness of the eater and killing the eaten organism. 
