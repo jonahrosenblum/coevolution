@@ -155,10 +155,6 @@ class Organism {
     return brainInputs;
   }
 
-  getEaten() {
-    this.fitness -= 30;
-  }
-
   nextMovement() {
     const bodies1 = this.getRaycast(this.eyeIndex1);
     const bodies2 = this.getRaycast(this.eyeIndex2);
